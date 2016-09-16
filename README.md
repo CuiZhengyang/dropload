@@ -87,7 +87,7 @@ $('.element').dropload({
 | threshold  | 提前加载距离   | 加载区高度2/3 | 正整数 |
 | loadUpFn   | 上方function | 空  | function(me){<br/>//你的代码<br/>me.resetload();<br/>} |
 | loadDownFn | 下方function | 空  | function(me){<br/>//你的代码<br/>me.resetload();<br/>} |
-
+| loadAtFirst | 第一次是否强制加载数据 | true  | false|
 ## API
 
 暴露一些功能，可以让dropload更灵活的使用
@@ -120,6 +120,8 @@ $('.element').dropload({
 <meta name="x5-fullscreen" content="true">
 ````
 例如DEMO1
+
+当希望整个页面滚动时加载数据，因为顶部有太多的文本可能导致文本的高度-threshold>_scrollWindowHeight的高度从而无法加载的bug
 
 ## dropload使用交流群
 
