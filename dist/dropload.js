@@ -34,6 +34,7 @@
     MyDropLoad.prototype.init = function(options){
         var me = this;
         me.opts = $.extend(true, {}, {
+            loadAtFirst:true,
             scrollArea : me.$element,                                            // 滑动区域
             domUp : {                                                            // 上方DOM
                 domClass   : 'dropload-up',
@@ -159,7 +160,7 @@
                 me.$element.prepend('<div class="'+me.opts.domUp.domClass+'"></div>');
                 me.upInsertDOM = true;
             }
-            
+
             fnTransition(me.$domUp,0);
 
             // 下拉
@@ -167,11 +168,11 @@
                 me._offsetY = _absMoveY;
                 // todo：move时会不断清空、增加dom，有可能影响性能，下同
                 me.$domUp.html(me.opts.domUp.domRefresh);
-            // 指定距离 < 下拉距离 < 指定距离*2
+                // 指定距离 < 下拉距离 < 指定距离*2
             }else if(_absMoveY > me.opts.distance && _absMoveY <= me.opts.distance*2){
                 me._offsetY = me.opts.distance+(_absMoveY-me.opts.distance)*0.5;
                 me.$domUp.html(me.opts.domUp.domUpdate);
-            // 下拉距离 > 指定距离*2
+                // 下拉距离 > 指定距离*2
             }else{
                 me._offsetY = me.opts.distance+me.opts.distance*0.5+(_absMoveY-me.opts.distance*2)*0.2;
             }
@@ -204,8 +205,15 @@
     // 如果文档高度不大于窗口高度，数据较少，自动加载下方数据
     function fnAutoLoad(me){
         if(me.opts.autoLoad){
-            if((me._scrollContentHeight - me._threshold) <= me._scrollWindowHeight){
+            if(me.opts.scrollArea == win&&me.opts.loadAtFirst)
+            {
+                me.opts.loadAtFirst=false;
                 loadDown(me);
+            }
+            else{
+                if((me._scrollContentHeight - me._threshold) <= me._scrollWindowHeight){
+                    loadDown(me);
+                }
             }
         }
     }
@@ -235,17 +243,17 @@
             // 如果操作方向向上
             if(me.direction == 'up'){
                 me.isLockDown = true;
-            // 如果操作方向向下
+                // 如果操作方向向下
             }else if(me.direction == 'down'){
                 me.isLockUp = true;
             }else{
                 me.isLockUp = true;
                 me.isLockDown = true;
             }
-        // 如果指定锁上方
+            // 如果指定锁上方
         }else if(direction == 'up'){
             me.isLockUp = true;
-        // 如果指定锁下方
+            // 如果指定锁下方
         }else if(direction == 'down'){
             me.isLockDown = true;
             // 为了解决DEMO5中tab效果bug，因为滑动到下面，再滑上去点tab，direction=down，所以有bug
@@ -274,8 +282,12 @@
     };
 
     // 重置
-    MyDropLoad.prototype.resetload = function(){
+    MyDropLoad.prototype.resetload = function(loadAtFirst){
         var me = this;
+        if(!!loadAtFirst)
+        {
+            me.opts.loadAtFirst=true;
+        }
         if(me.direction == 'down' && me.upInsertDOM){
             me.$domUp.css({'height':'0'}).on('webkitTransitionEnd mozTransitionEnd transitionend',function(){
                 me.loading = false;
@@ -297,6 +309,7 @@
             }
         }
     };
+
 
     // css过渡
     function fnTransition(dom,num){
